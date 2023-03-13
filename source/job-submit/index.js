@@ -11,6 +11,7 @@ exports.handler = async (event,context) => {
     const {
         MEDIACONVERT_ENDPOINT,
         MEDIACONVERT_ROLE,
+        CLOUDFRONT_DOMAIN,
         JOB_SETTINGS,
         DESTINATION_BUCKET,
         SOLUTION_ID,
@@ -29,6 +30,7 @@ exports.handler = async (event,context) => {
         const guid = uuidv4();
         const inputPath = `s3://${srcBucket}/${srcVideo}`;
         const outputPath = `s3://${DESTINATION_BUCKET}/${guid}`;
+        const keyUrl = `https://${CLOUDFRONT_DOMAIN}/${guid}/aes.key`
         const metaData = {
             Guid:guid,
             StackName:STACKNAME,
@@ -44,7 +46,7 @@ exports.handler = async (event,context) => {
         /**
          * parse settings file to update source / destination
          */
-        job = await utils.updateJobSettings(job,inputPath,outputPath,metaData,MEDIACONVERT_ROLE);
+        job = await utils.updateJobSettings(job,inputPath,outputPath,keyUrl,metaData,MEDIACONVERT_ROLE);
         /**
          * Submit Job
          */

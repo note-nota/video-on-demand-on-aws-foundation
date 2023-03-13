@@ -209,6 +209,7 @@ export class VodFoundation extends cdk.Stack {
             environment: {
                 MEDIACONVERT_ENDPOINT: customResourceEndpoint.getAttString('Endpoint'),
                 MEDIACONVERT_ROLE: mediaconvertRole.roleArn,
+                CLOUDFRONT_DOMAIN: cloudFront.cloudFrontWebDistribution.distributionDomainName,
                 JOB_SETTINGS: 'job-settings.json',
                 DESTINATION_BUCKET: destination.bucketName,
                 SOLUTION_ID: 'SO0146',

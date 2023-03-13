@@ -555,6 +555,15 @@
               "TimedMetadataId3Period": 10,
               "CaptionLanguageSetting": "OMIT",
               "Destination": "s3://destinationbucket/guid/hls/",
+              "Encryption": {
+                "EncryptionMethod": "AES128",
+                "ConstantInitializationVector": "1e090ce6345b0c617cb220feead10ade",
+                "StaticKeyProvider": {
+                  "StaticKeyValue": "bbe179ae77002a2154519db393a5b842",
+                  "Url": "https://archive-aes-key-test-1.s3.ap-northeast-1.amazonaws.com/aes.key"
+                },
+                "Type": "STATIC_KEY"
+              },
               "TimedMetadataId3Frame": "PRIV",
               "CodecSpecification": "RFC_4281",
               "OutputSelection": "MANIFESTS_AND_SEGMENTS",

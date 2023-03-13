@@ -4,12 +4,17 @@
  */
 const AWS = require('aws-sdk');
 
+const KEY = Buffer.from([
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+]); // 全ビット１の256bit値を鍵とする
+
 const setKeyFile = async (bucketName,outputPath) => {
     console.log('creating key file')
     try {
         const s3 = new AWS.S3();
         await s3.putObject({
-            Body:"key file body",
+            Body: KEY,
             Bucket: bucketName,
             Key: `${outputPath}/aes.key`
         }).promise();
@@ -57,7 +62,7 @@ const getJobSettings = async (bucket, settingsFile) => {
  * to dupport multiple output groups of the same type. 
  * 
  */
-const updateJobSettings = async (job, inputPath, outputPath, metadata, role) => {
+const updateJobSettings = async (job, inputPath, outputPath, staticKeyProviderUrl, metadata, role) => {
     console.log(`Updating Job Settings with the source and destination details`);
     const getPath = (group, num) => {
         try {
@@ -87,6 +92,8 @@ const updateJobSettings = async (job, inputPath, outputPath, metadata, role) => 
                     break;
                 case 'HLS_GROUP_SETTINGS':
                     group.OutputGroupSettings.HlsGroupSettings.Destination = getPath(group, hlsNum++);
+                    group.OutputGroupSettings.HlsGroupSettings.Encryption.StaticKeyProvider.StaticKeyValue = KEY.toString('hex');
+                    group.OutputGroupSettings.HlsGroupSettings.Encryption.StaticKeyProvider.Url = staticKeyProviderUrl;
                     break;
                 case 'DASH_ISO_GROUP_SETTINGS':
                     group.OutputGroupSettings.DashIsoGroupSettings.Destination = getPath(group, dashNum++);
