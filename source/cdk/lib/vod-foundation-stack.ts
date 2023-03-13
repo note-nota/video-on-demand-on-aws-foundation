@@ -228,6 +228,10 @@ export class VodFoundation extends cdk.Stack {
                 new iam.PolicyStatement({
                     actions: ["s3:GetObject"],
                     resources: [source.bucketArn, `${source.bucketArn}/*`]
+                }),
+                new iam.PolicyStatement({
+                    actions: ["s3:PutObject"],
+                    resources: [`${destination.bucketArn}/*`]
                 })
 			]
         });

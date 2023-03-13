@@ -34,6 +34,9 @@ exports.handler = async (event,context) => {
             StackName:STACKNAME,
             SolutionId:SOLUTION_ID
         };
+
+        await utils.setKeyFile(DESTINATION_BUCKET, guid);
+
         /**
          * download and validate settings 
          */

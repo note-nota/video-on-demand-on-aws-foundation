@@ -4,6 +4,22 @@
  */
 const AWS = require('aws-sdk');
 
+const setKeyFile = async (bucketName,outputPath) => {
+    console.log('creating key file')
+    try {
+        const s3 = new AWS.S3();
+        await s3.putObject({
+            Body:"key file body",
+            Bucket: bucketName,
+            Key: `${outputPath}/aes.key`
+        }).promise();
+    } catch (err) {
+        console.error(err);
+        throw err;
+    }
+    console.log('creating key file complete')
+}
+
 /**
  * Download Job Settings from s3 and run a basic validationvalidate 
 */
@@ -156,6 +172,7 @@ const sendError = async (topic,stackName,logGroupName,err) => {
 
 
 module.exports = {
+    setKeyFile: setKeyFile,
     getJobSettings: getJobSettings,
     updateJobSettings: updateJobSettings,
     createJob: createJob,
