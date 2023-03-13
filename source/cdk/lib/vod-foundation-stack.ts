@@ -22,6 +22,7 @@ export class VodFoundation extends cdk.Stack {
          */
         const solutionId = 'SO0146'
         const solutionName = 'Video on Demand on AWS Foundation'
+        const solutionVersion = 'v1.2.0'
         this.templateOptions.description = '(SO0146) v1.2.0: Video on Demand on AWS Foundation Solution Implementation';
         /**
          * Mapping for sending anonymous metrics to AWS Solution Builders API
@@ -372,20 +373,20 @@ export class VodFoundation extends cdk.Stack {
             description: "Attribute group for solution information.",
             attributes: {
                 ApplicationType: 'AWS-Solutions',
-                SolutionVersion: '%%VERSION%%',
+                SolutionVersion: solutionVersion,
                 SolutionID: solutionId,
                 SolutionName: solutionName
             }
         });
         const appRegistry = new appreg.Application(this, 'AppRegistryApp', {
             applicationName: applicationName,
-            description: `Service Catalog application to track and manage all your resources. The SolutionId is ${solutionId} and SolutionVersion is %%VERSION%%.`
+            description: `Service Catalog application to track and manage all your resources. The SolutionId is ${solutionId} and SolutionVersion is ${solutionVersion}.`
         });
         appRegistry.associateStack(this);
         cdk.Tags.of(appRegistry).add('solutionId', solutionId);
         cdk.Tags.of(appRegistry).add('SolutionName', solutionName);
         cdk.Tags.of(appRegistry).add('SolutionDomain', 'CloudFoundations');
-        cdk.Tags.of(appRegistry).add('SolutionVersion', '%%VERSION%%');
+        cdk.Tags.of(appRegistry).add('SolutionVersion', solutionVersion);
         cdk.Tags.of(appRegistry).add('appRegistryApplicationName', 'vod-foundation-stack');
         cdk.Tags.of(appRegistry).add('ApplicationType', 'AWS-Solutions');
 
