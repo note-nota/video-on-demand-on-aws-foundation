@@ -3,11 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 const AWS = require('aws-sdk');
+const crypto = require('crypto');
 
-const KEY = Buffer.from([
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-]); // 全ビット１の256bit値を鍵とする
+const KEY = crypto.randomBytes(16);
 
 const setKeyFile = async (bucketName,outputPath) => {
     console.log('creating key file')
@@ -92,6 +90,7 @@ const updateJobSettings = async (job, inputPath, outputPath, staticKeyProviderUr
                     break;
                 case 'HLS_GROUP_SETTINGS':
                     group.OutputGroupSettings.HlsGroupSettings.Destination = getPath(group, hlsNum++);
+                    group.OutputGroupSettings.HlsGroupSettings.Encryption.ConstantInitializationVector = crypto.randomBytes(16).toString('hex');
                     group.OutputGroupSettings.HlsGroupSettings.Encryption.StaticKeyProvider.StaticKeyValue = KEY.toString('hex');
                     group.OutputGroupSettings.HlsGroupSettings.Encryption.StaticKeyProvider.Url = staticKeyProviderUrl;
                     break;
