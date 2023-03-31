@@ -5,14 +5,20 @@
 const AWS = require('aws-sdk');
 const crypto = require('crypto');
 
-const KEY = crypto.randomBytes(16);
+function generateKey () {
+    return crypto.randomBytes(16); // AES-128 requires a 128-bit (16-byte) key
+}
 
-const setKeyFile = async (bucketName,outputPath) => {
+function generateIV() {
+    return crypto.randomBytes(16); // AES-CBC mode requires a 128-bit (16-byte) IV
+}
+
+const setKeyFile = async (bucketName,outputPath,key) => {
     console.log('creating key file')
     try {
         const s3 = new AWS.S3();
         await s3.putObject({
-            Body: KEY,
+            Body: key,
             Bucket: bucketName,
             Key: `${outputPath}/aes.key`
         }).promise();
@@ -60,7 +66,7 @@ const getJobSettings = async (bucket, settingsFile) => {
  * to dupport multiple output groups of the same type. 
  * 
  */
-const updateJobSettings = async (job, inputPath, outputPath, staticKeyProviderUrl, metadata, role) => {
+const updateJobSettings = async (job, inputPath, outputPath, iv, key, staticKeyProviderUrl, metadata, role) => {
     console.log(`Updating Job Settings with the source and destination details`);
     const getPath = (group, num) => {
         try {
@@ -90,8 +96,8 @@ const updateJobSettings = async (job, inputPath, outputPath, staticKeyProviderUr
                     break;
                 case 'HLS_GROUP_SETTINGS':
                     group.OutputGroupSettings.HlsGroupSettings.Destination = getPath(group, hlsNum++);
-                    group.OutputGroupSettings.HlsGroupSettings.Encryption.ConstantInitializationVector = crypto.randomBytes(16).toString('hex');
-                    group.OutputGroupSettings.HlsGroupSettings.Encryption.StaticKeyProvider.StaticKeyValue = KEY.toString('hex');
+                    group.OutputGroupSettings.HlsGroupSettings.Encryption.ConstantInitializationVector = iv.toString('hex');
+                    group.OutputGroupSettings.HlsGroupSettings.Encryption.StaticKeyProvider.StaticKeyValue = key.toString('hex');
                     group.OutputGroupSettings.HlsGroupSettings.Encryption.StaticKeyProvider.Url = staticKeyProviderUrl;
                     break;
                 case 'DASH_ISO_GROUP_SETTINGS':
@@ -178,6 +184,8 @@ const sendError = async (topic,stackName,logGroupName,err) => {
 
 
 module.exports = {
+    generateKey: generateKey,
+    generateIV: generateIV,
     setKeyFile: setKeyFile,
     getJobSettings: getJobSettings,
     updateJobSettings: updateJobSettings,

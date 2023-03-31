@@ -31,13 +31,15 @@ exports.handler = async (event,context) => {
         const inputPath = `s3://${srcBucket}/${srcVideo}`;
         const outputPath = `s3://${DESTINATION_BUCKET}/${guid}`;
         const keyUrl = `https://${CLOUDFRONT_DOMAIN}/${guid}/aes.key`
+        const key = utils.generateKey();
+        const iv = utils.generateIV()
         const metaData = {
             Guid:guid,
             StackName:STACKNAME,
             SolutionId:SOLUTION_ID
         };
 
-        await utils.setKeyFile(DESTINATION_BUCKET, guid);
+        await utils.setKeyFile(DESTINATION_BUCKET, `${year}/${month}/${day}/${guid}`, key);
 
         /**
          * download and validate settings 
@@ -46,7 +48,7 @@ exports.handler = async (event,context) => {
         /**
          * parse settings file to update source / destination
          */
-        job = await utils.updateJobSettings(job,inputPath,outputPath,keyUrl,metaData,MEDIACONVERT_ROLE);
+        job = await utils.updateJobSettings(job,inputPath,outputPath,iv,key,keyUrl,metaData,MEDIACONVERT_ROLE);
         /**
          * Submit Job
          */
