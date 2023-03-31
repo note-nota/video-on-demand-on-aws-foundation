@@ -18,7 +18,12 @@ exports.handler = async (event,context) => {
         STACKNAME,
         SNS_TOPIC_ARN
     } = process.env;
-    
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+
     try {
         /**
          * define inputs/ouputs and a unique string for the mediaconver output path in S3. 
@@ -29,8 +34,8 @@ exports.handler = async (event,context) => {
         const settingsFile = `${srcVideo.split("/")[0]}/${JOB_SETTINGS}`;
         const guid = uuidv4();
         const inputPath = `s3://${srcBucket}/${srcVideo}`;
-        const outputPath = `s3://${DESTINATION_BUCKET}/${guid}`;
-        const keyUrl = `https://${CLOUDFRONT_DOMAIN}/${guid}/aes.key`
+        const outputPath = `s3://${DESTINATION_BUCKET}/${year}/${month}/${day}/${guid}`;
+        const keyUrl = `https://${CLOUDFRONT_DOMAIN}/${year}/${month}/${day}/${guid}/aes.key`
         const key = utils.generateKey();
         const iv = utils.generateIV()
         const metaData = {
